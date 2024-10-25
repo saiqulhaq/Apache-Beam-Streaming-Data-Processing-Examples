@@ -1,5 +1,6 @@
 import argparse
 import json
+from typing import Tuple
 
 import apache_beam as beam
 from apache_beam.options.pipeline_options import PipelineOptions
@@ -9,6 +10,9 @@ parser = argparse.ArgumentParser()
 args, beam_args = parser.parse_known_args()
 options = PipelineOptions(beam_args)
 
+def show_output(data: Tuple):
+    _, number = data
+    print(f"Total number you input: {number}")
 
 def main():
     with beam.Pipeline(options=options) as p:
@@ -18,7 +22,7 @@ def main():
                   | beam.Map(lambda s: ("number", s.get("number")))
                   | beam.WindowInto(Sessions(10))
                   | beam.CombinePerKey(sum)
-                  | beam.Map(print)
+                  | beam.Map(show_output)
                   )
 
 
